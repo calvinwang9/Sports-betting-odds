@@ -3,7 +3,7 @@ This project revolves around the practice of matched betting, which I developed 
 
 
 ## Turnover
-The program achieves a risk-free profit in turning over a high percentage of bonus bets into real cash.
+The program helps find a risk-free profit in turning over a high percentage of bonus bets into real cash.
 
 Using an api to grab the best odds from various Australian bookmakers (the-odds-api.com), I calculated the highest turnover percentage achievable with the different odds across bookmakers for each upcoming game, as well as how much cash to bet on one side given a bonus bet on the other.
 
