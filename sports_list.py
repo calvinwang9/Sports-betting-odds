@@ -1,6 +1,6 @@
 import json
 import requests
-api_key = '<removed>'
+api_key = '0208e3093800f6b65ee6103e854b4578'
 
 
 # get a list of in-season sports

@@ -1,13 +1,17 @@
 import json
 import requests
 import time
-from comeback_calc import comeback_calc
+from turnover import turnover
+from margin import margin
+from promo import sportsbet_pointsbet_promo
 import pandas as pd
 
 
 api_key = '<removed>'
 
-sport_key = 'basketball_nba' # upcoming | <sport_key>
+sport_key = 'upcoming'
+#sport_key = 'aussierules_afl'
+#sport_key = 'rugbyleague_nrl' # upcoming | <sport_key>
 
 odds_response = requests.get('https://api.the-odds-api.com/v3/odds', params={
     'api_key': api_key,
@@ -41,7 +45,7 @@ else:
         if time_remaining < 0:
             event_data['time'] = 'live'
         else: 
-            event_data['time'] = str(int(time_remaining // 86400)) + ' days ' + str(int(time_remaining //3600 % 24)) + ' hours'
+            event_data['time'] = str(int(time_remaining // 86400)) + 'd ' + str(int(time_remaining //3600 % 24)) + 'h'
         
         home_odds = 0
         away_odds = 0
@@ -59,20 +63,25 @@ else:
         
         event_data['home_odds'] = home_odds
         event_data['away_odds'] = away_odds
+        event_data['margin'] = round(margin(home_odds, away_odds)*100, 2)
         if home_odds > away_odds:
-            event_data['potential_loss'] = comeback_calc(home_odds, away_odds)
+            event_data['turnover'] = round(100*turnover(home_odds, away_odds), 2)
+            event_data['promo'] = round(sportsbet_pointsbet_promo(home_odds, away_odds), 2)
         else:
-            event_data['potential_loss'] = comeback_calc(away_odds, home_odds)
+            event_data['turnover'] = round(100*turnover(away_odds, home_odds), 2)
+            event_data['promo'] = round(sportsbet_pointsbet_promo(away_odds, home_odds), 2)
             
         df1 = pd.DataFrame(sorted(home.items(), key=lambda x: x[1], reverse=True), columns=['', event_data['home_team']])
         df2 = pd.DataFrame(sorted(away.items(), key=lambda x: x[1], reverse=True), columns=['', event_data['away_team']])
         df3 = pd.concat([df1, df2], axis = 1)
-        print('potential loss = $' + str(event_data['potential_loss']))
+        print('turnover = ' + str(event_data['turnover']) + '%')
         print(time.ctime(event['commence_time']))
         print(df3)
         print('----------------------------------------------------------------------------------------')
         data_list.append(event_data)
-
+#        print('\n| home: ' + str(home_odds) + ' | away: ' + str(away_odds) + ' |')
+#        print('turnover = ' + str(round(turnover(home_odds, away_odds)*100, 2)) + '%\n')
+    
     dataframe = pd.DataFrame(data_list)
     
     print(dataframe.to_string())
